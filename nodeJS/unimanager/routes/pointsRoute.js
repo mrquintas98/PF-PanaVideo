@@ -7,4 +7,10 @@ router.get('/points', async function(req, res, next) {
     res.status(result.status).send(result.result);
 });
 
+router.get('/:id/route', async function(req, res, next) {
+    let id = req.params.id;
+    let result = await spotModel.getRoutePoints(id);
+    res.status(result.status).send(result.result);
+});
+
 module.exports = router;

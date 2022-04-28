@@ -10,6 +10,7 @@ import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -27,11 +28,31 @@ import com.example.javappandroid.databinding.ActivityMapsBinding;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Headers;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
+    serverRequest getServerRequest = new serverRequest();
+    JSONArray points = null;
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
     private static final int LOCATION_PERMISSION_CODE = 101;
+
 
 
     @Override
@@ -71,6 +92,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        try {
+            points = getServerRequest.execute("http://10.0.2.2:3000/points/points").get();
+            Log.i("SIZE", " -> " + points.length());
+
+            JSONObject aux = new JSONObject(points.get(0).toString());
+            Log.i("OBJECT", aux.toString());
+
+
+            for (int i = 0; i<points.length();i++){
+                double lati = points.getJSONObject(i).getDouble("lati");
+                double longi = points.getJSONObject(i).getDouble("longi");
+                String name = points.getJSONObject(i).getString("name");
+
+                LatLng point = new LatLng(longi,lati);
+                mMap.addMarker(new MarkerOptions().position(point).title(name));
+                Log.i("marker", lati + " " + longi + " " + name);
+            }
+
+        } catch (ExecutionException | JSONException | InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+       /* for(int i = 0; i<pointList.size();i++){
+            LatLng point = new LatLng(pointList.get(i).getLati(),pointList.get(i).getLongi());
+            mMap.addMarker(new MarkerOptions().position(point).title(point);
+        }
+*/
+
+
+
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(0, 0);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
@@ -102,5 +154,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         ActivityCompat.requestPermissions(this,new String []{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_CODE);
         ActivityCompat.requestPermissions(this,new String []{Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_PERMISSION_CODE);
     }
+
+
 }
 
