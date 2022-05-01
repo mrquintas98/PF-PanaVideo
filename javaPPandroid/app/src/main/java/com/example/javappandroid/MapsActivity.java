@@ -10,6 +10,7 @@ import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -59,12 +60,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
     private static final int LOCATION_PERMISSION_CODE = 101;
-    private double GEOFENCE_RADIUS = 1000.00;
+    private double GEOFENCE_RADIUS = 100.00;
     FusedLocationProviderClient mFusedLocationClient;
     Handler handler = new Handler();
     Runnable runnable;
     int delay = 5000;
-
+    MediaPlayer mp;
 
 
 
@@ -133,8 +134,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                  mMap.addCircle( new CircleOptions()
                         .center(point)
                         .radius(GEOFENCE_RADIUS)
-                        .strokeColor(Color.BLACK)
-                        .fillColor(Color.RED));
+                        .strokeColor(Color.parseColor("#990EE540"))
+                        .fillColor(Color.parseColor("#9065EF85")));
+
 
 
 
@@ -191,7 +193,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         double lat = location.getLatitude();
                         double lon = location.getLongitude();
                         Log.i("AAAAAAAAAAAAAAAAAAAAAAAAA", lat + " " + lon);
-                        checkForGeoFenceEntry(lat,lon,40.000,-122.084,GEOFENCE_RADIUS);
+                        checkForGeoFenceEntry(lat,lon,38.707146 ,-9.152514,GEOFENCE_RADIUS);
                     }
                     else{
                         Log.i("ERRO", "erro na obtenção da localização");
@@ -212,6 +214,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (distanceInMeters < radius) {
                 // User is inside the Geo-fence
                 Log.i("GEOFENCE", "Utilizador dentro");
+                mp = MediaPlayer.create(this, R.raw.ding);
+                mp.start();
             }
         }
 
