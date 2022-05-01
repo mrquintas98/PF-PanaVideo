@@ -8,8 +8,10 @@ import androidx.fragment.app.FragmentActivity;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -22,11 +24,15 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.javappandroid.databinding.ActivityMapsBinding;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.maps.android.SphericalUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,6 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import kotlin.Unit;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Headers;
@@ -52,6 +59,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
     private static final int LOCATION_PERMISSION_CODE = 101;
+    private double GEOFENCE_RADIUS = 1000.00;
+    FusedLocationProviderClient mFusedLocationClient;
+    Handler handler = new Handler();
+    Runnable runnable;
+    int delay = 5000;
+
 
 
 
@@ -61,6 +74,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
 
         if(isLocationPermissionGranted()){
 
@@ -72,6 +88,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         else{
             requestLocationPermission();
         }
+
+
+
+        
+
+
 
 
 
@@ -108,6 +130,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 LatLng point = new LatLng(longi,lati);
                 mMap.addMarker(new MarkerOptions().position(point).title(name));
                 Log.i("marker", lati + " " + longi + " " + name);
+                 mMap.addCircle( new CircleOptions()
+                        .center(point)
+                        .radius(GEOFENCE_RADIUS)
+                        .strokeColor(Color.BLACK)
+                        .fillColor(Color.RED));
+
+
+
+
+                Log.i("circle",point.toString());
             }
 
         } catch (ExecutionException | JSONException | InterruptedException e) {
@@ -115,18 +147,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
 
-       /* for(int i = 0; i<pointList.size();i++){
-            LatLng point = new LatLng(pointList.get(i).getLati(),pointList.get(i).getLongi());
-            mMap.addMarker(new MarkerOptions().position(point).title(point);
-        }
-*/
 
-
-
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(0, 0);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
         if(ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)
                 ==PackageManager.PERMISSION_GRANTED
@@ -134,7 +155,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION)
                         ==PackageManager.PERMISSION_GRANTED){
             mMap.setMyLocationEnabled(true);
+
         }
+
+
     }
 
     private boolean isLocationPermissionGranted(){
@@ -153,6 +177,59 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void requestLocationPermission(){
         ActivityCompat.requestPermissions(this,new String []{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_CODE);
         ActivityCompat.requestPermissions(this,new String []{Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_PERMISSION_CODE);
+    }
+
+    @SuppressLint("MissingPermission")
+    private void getLastLocation() {
+        // check if permissions are given
+
+            mFusedLocationClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+                @Override
+                public void onComplete(@NonNull Task<Location> task) {
+                    Location location = task.getResult();
+                    if (location != null) {
+                        double lat = location.getLatitude();
+                        double lon = location.getLongitude();
+                        Log.i("AAAAAAAAAAAAAAAAAAAAAAAAA", lat + " " + lon);
+                        checkForGeoFenceEntry(lat,lon,40.000,-122.084,GEOFENCE_RADIUS);
+                    }
+                    else{
+                        Log.i("ERRO", "erro na obtenção da localização");
+                    }
+                }
+            });
+
+
+
+        }
+
+        private void checkForGeoFenceEntry (double userLat, double userLon, double geofenceLat, double geofenceLon, double radius){
+            LatLng userLocation = new LatLng(userLat,userLon);
+            LatLng geofenceLocation = new LatLng(geofenceLat,geofenceLon);
+
+            double distanceInMeters = SphericalUtil.computeDistanceBetween(userLocation, geofenceLocation);
+
+            if (distanceInMeters < radius) {
+                // User is inside the Geo-fence
+                Log.i("GEOFENCE", "Utilizador dentro");
+            }
+        }
+
+    @Override
+    protected void onResume() {
+        handler.postDelayed(runnable = new Runnable() {
+            public void run() {
+                handler.postDelayed(runnable, delay);
+                getLastLocation();
+                Log.i("CORRER", "correr");
+            }
+        }, delay);
+        super.onResume();
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        handler.removeCallbacks(runnable); //stop handler when activity not visible super.onPause();
     }
 
 
