@@ -14,6 +14,8 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -33,7 +35,9 @@ import com.example.javappandroid.databinding.ActivityMapsBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.maps.android.SphericalUtil;
+import com.google.maps.android.collections.MarkerManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -66,6 +70,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Runnable runnable;
     int delay = 5000;
     MediaPlayer mp;
+    //MarkerManager.Collection markerCollection;
+    //MarkerManager markerManager = new MarkerManager(mMap);
+    List <Point> pointList = new ArrayList<>();
+    private double markerLat;
+    private double markerLon;
+    private int cont = 0;
+    private boolean route = false;
+
+
 
 
 
@@ -77,6 +90,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(binding.getRoot());
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+
+        Button button = (Button) findViewById(R.id.routeButton);
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                route = true;
+                cont = 0;
+                nextRoutePoint();
+            }
+        });
+
+
+
 
 
         if(isLocationPermissionGranted()){
@@ -119,34 +145,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             points = getServerRequest.execute("http://10.0.2.2:3000/points/points").get();
             Log.i("SIZE", " -> " + points.length());
 
-            JSONObject aux = new JSONObject(points.get(0).toString());
+            JSONObject aux = new JSONObject(points.get(2).toString());
             Log.i("OBJECT", aux.toString());
 
 
             for (int i = 0; i<points.length();i++){
-                double lati = points.getJSONObject(i).getDouble("lati");
-                double longi = points.getJSONObject(i).getDouble("longi");
-                String name = points.getJSONObject(i).getString("name");
+                Point point = new Point(points.getJSONObject(i).getInt("id"),
+                        points.getJSONObject(i).getDouble("longi"),
+                        points.getJSONObject(i).getDouble("lati"),
+                        points.getJSONObject(i).getString("name"),
+                        points.getJSONObject(i).getString("description"),
+                        points.getJSONObject(i).getString("build"));
+                        pointList.add(point);
 
-                LatLng point = new LatLng(longi,lati);
-                mMap.addMarker(new MarkerOptions().position(point).title(name));
-                Log.i("marker", lati + " " + longi + " " + name);
-                 mMap.addCircle( new CircleOptions()
-                        .center(point)
-                        .radius(GEOFENCE_RADIUS)
-                        .strokeColor(Color.parseColor("#990EE540"))
-                        .fillColor(Color.parseColor("#9065EF85")));
+                markerLon = pointList.get(i).getLongi();
+                markerLat = pointList.get(i).getLati();
+
+                LatLng marker = new LatLng(markerLon,markerLat);
+                mMap.addMarker(new MarkerOptions().position(marker).title(pointList.get(i).getName()));
+
+                Log.i("marker", pointList.get(i).getLati() + " " + pointList.get(i).getLongi() + " " + pointList.get(i).getName());
 
 
-
-
-
-                Log.i("circle",point.toString());
             }
 
         } catch (ExecutionException | JSONException | InterruptedException e) {
             e.printStackTrace();
         }
+
 
 
 
@@ -192,8 +218,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     if (location != null) {
                         double lat = location.getLatitude();
                         double lon = location.getLongitude();
-                        Log.i("AAAAAAAAAAAAAAAAAAAAAAAAA", lat + " " + lon);
-                        checkForGeoFenceEntry(lat,lon,38.707146 ,-9.152514,GEOFENCE_RADIUS);
+
+                        checkForGeoFenceEntry(lat,lon,markerLon ,markerLat,GEOFENCE_RADIUS);
                     }
                     else{
                         Log.i("ERRO", "erro na obtenção da localização");
@@ -216,18 +242,60 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.i("GEOFENCE", "Utilizador dentro");
                 mp = MediaPlayer.create(this, R.raw.ding);
                 mp.start();
+
+
+                if (cont<pointList.size()){
+                    cont++;
+                    nextRoutePoint();
+                    Log.i("PROXIMO DENTRO", "" + cont);
+                }
+                else{
+                    route = false;
+                    cont = 0;
+                    handler.removeCallbacks(runnable);
+                    Log.i("ROUTA", "rota terminada");
+                    cont = 0;
+
+
+                }
+
             }
+        }
+
+
+
+        private void nextRoutePoint () {
+         handler.removeCallbacks(runnable);
+            mMap.clear();
+            markerLon = pointList.get(cont).getLongi();
+            markerLat = pointList.get(cont).getLati();
+
+            LatLng marker = new LatLng(markerLon,markerLat);
+            mMap.addMarker(new MarkerOptions().position(marker).title(pointList.get(cont).getName()));
+
+            mMap.addCircle( new CircleOptions()
+                    .center(marker)
+                    .radius(GEOFENCE_RADIUS)
+                    .strokeColor(Color.parseColor("#990EE540"))
+                    .fillColor(Color.parseColor("#9065EF85")));
+
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(marker));
+
+
+                handler.postDelayed(runnable = new Runnable() {
+                    public void run() {
+                        handler.postDelayed(runnable, delay);
+                        getLastLocation();
+                        Log.i("CORRER", "correr");
+                    }
+                }, delay);
+
         }
 
     @Override
     protected void onResume() {
-        handler.postDelayed(runnable = new Runnable() {
-            public void run() {
-                handler.postDelayed(runnable, delay);
-                getLastLocation();
-                Log.i("CORRER", "correr");
-            }
-        }, delay);
+
+
         super.onResume();
     }
     @Override

@@ -2,13 +2,13 @@ package com.example.javappandroid;
 
 public class Point {
     private int id;
-    private float longi;
-    private float lati;
+    private double longi;
+    private double lati;
     private String name;
     private String description;
     private String build;
 
-    public Point (int id,float longi,float lati,String name,String description,String build){
+    public Point (int id,double longi,double lati,String name,String description,String build){
         this.id = id;
         this.longi = longi;
         this.lati = lati;
@@ -43,19 +43,19 @@ public class Point {
         this.id = id;
     }
 
-    public float getLongi() {
+    public double getLongi() {
         return longi;
     }
 
-    public void setLongi(float longi) {
+    public void setLongi(double longi) {
         this.longi = longi;
     }
 
-    public float getLati() {
+    public double getLati() {
         return lati;
     }
 
-    public void setLati(float lati) {
+    public void setLati(double lati) {
         this.lati = lati;
     }
 
