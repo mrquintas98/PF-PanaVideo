@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item android:title="Routes">
+            <menu>
+                <item
+                    android:id="@+id/nav_map"
+                    android:icon="@drawable/ic_map"
+                    android:title="Map" />
+                <item
+                    android:id="@+id/nav_events"
+                    android:icon="@drawable/ic_events"
+                    android:title="Events" />
+                <item
+                    android:id="@+id/nav_spotify"
+                    android:icon="@drawable/ic_spotify"
+                    android:title="Playlists"
+            </menu>
+        </item>
+        <item android:title="User">
+            <menu>
+                <item
+                    android:id="@+id/nav_profile"
+                    android:icon="@drawable/ic_profile"
+                    android:title="Profile" />
+                <item
+                    android:id="@+id/nav_achievements"
+                    android:icon="@drawable/ic_achievements"
+                    android:title="Achievements" />
+                <item
+                    android:id="@+id/nav_history"
+                    android:icon="@drawable/ic_history"
+                    android:title="History" />
+            </menu>
+        </item>
+    </group>
+    <item android:title="More">
+        <menu>
+            <item
+                android:id="@+id/nav_info"
+                android:icon="@drawable/ic_info"
+                android:title="Info" />
+            <item
+                android:id="@+id/nav_settings"
+                android:icon="@drawable/ic_settings"
+                android:title="Settings" />
+            <item
+                android:id="@+id/nav_problem"
+                android:icon="@drawable/ic_report_problem"
+                android:title="Report a Problem" />
+        </menu>
+    </item>
+
+</menu>

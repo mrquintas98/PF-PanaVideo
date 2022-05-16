@@ -3,6 +3,13 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Github/PF-PanaVideo/javaPPandroid/app/src/main/res/drawable/ic_events.xml" value="0.2065" />
+        <entry key="..\:/Github/PF-PanaVideo/javaPPandroid/app/src/main/res/drawable/ic_profile_pic.xml" value="0.343" />
+        <entry key="..\:/Github/PF-PanaVideo/javaPPandroid/app/src/main/res/layout/activity_main.xml" value="0.2658514492753623" />
+        <entry key="..\:/Github/PF-PanaVideo/javaPPandroid/app/src/main/res/layout/activity_maps.xml" value="0.2658514492753623" />
+        <entry key="..\:/Github/PF-PanaVideo/javaPPandroid/app/src/main/res/layout/fragment_map.xml" value="0.38645833333333335" />
+        <entry key="..\:/Github/PF-PanaVideo/javaPPandroid/app/src/main/res/layout/nav_header.xml" value="0.22735042735042735" />
+        <entry key="..\:/Github/PF-PanaVideo/javaPPandroid/app/src/main/res/menu/drawer_menu.xml" value="0.5" />
         <entry key="..\:/Users/mrtmc/Documents/GitHub/PF-PanaVideo/javaPPandroid/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.2065" />
         <entry key="..\:/Users/mrtmc/Documents/GitHub/PF-PanaVideo/javaPPandroid/app/src/main/res/drawable/ic_launcher_background.xml" value="0.2065" />
         <entry key="..\:/Users/mrtmc/Documents/GitHub/PF-PanaVideo/javaPPandroid/app/src/main/res/layout/activity_maps.xml" value="0.18541666666666667" />

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="PrototypeP" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">#949494</item>
+        <item name="colorPrimaryDark">#504F4E</item>
+        <item name="colorAccent">#C52236</item>
+    </style>
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+</resources>
