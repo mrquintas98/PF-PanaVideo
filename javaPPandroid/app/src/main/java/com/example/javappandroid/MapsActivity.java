@@ -1,6 +1,7 @@
 package com.example.javappandroid;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -49,15 +50,11 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import kotlin.Unit;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Headers;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+
+public class MapsActivity extends DrawerBaseActivity implements OnMapReadyCallback {
+
+    ActivityMapsBinding activityMapsBinding;
 
     serverRequest getServerRequest = new serverRequest();
     JSONArray points = null;
@@ -70,8 +67,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Runnable runnable;
     int delay = 5000;
     MediaPlayer mp;
-    //MarkerManager.Collection markerCollection;
-    //MarkerManager markerManager = new MarkerManager(mMap);
     List <Point> pointList = new ArrayList<>();
     private double markerLat;
     private double markerLon;
@@ -86,8 +81,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = ActivityMapsBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        activityMapsBinding = ActivityMapsBinding.inflate(getLayoutInflater());
+        allocateActivityTitle("Map");
+        setContentView(activityMapsBinding.getRoot());
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
