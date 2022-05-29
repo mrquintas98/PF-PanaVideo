@@ -17,6 +17,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.JavaPPandroid">
         <activity
+            android:name=".RouteActivity"
+            android:exported="false" />
+        <activity
             android:name=".DrawerBaseActivity"
             android:exported="false" />
         <activity
@@ -49,7 +52,7 @@
         <activity
             android:name=".MapsActivity"
             android:exported="true"
-            android:label="@string/title_activity_maps"></activity>
+            android:label="@string/title_activity_maps" />
     </application>
 
 </manifest>
