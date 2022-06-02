@@ -2,6 +2,7 @@ package com.example.javappandroid;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -20,6 +21,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class RouteActivity extends DrawerBaseActivity {
@@ -31,6 +33,8 @@ public class RouteActivity extends DrawerBaseActivity {
     JSONArray routes = null;
     serverRequest getServerRequest = new serverRequest();
     ActivityRouteBinding activityRouteBinding;
+    public static int routeIdAll;
+    public static boolean isRoute = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,13 +44,13 @@ public class RouteActivity extends DrawerBaseActivity {
         setContentView(activityRouteBinding.getRoot());
 
         listView=findViewById(R.id.list);
-
+        List<Route> routeList = new ArrayList<>();
         pointArrayList = new ArrayList<>();
         pointArrayAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1,pointArrayList);
         listView.setAdapter(pointArrayAdapter);
 
         try {
-            routes = getServerRequest.execute("http://10.0.2.2:3000/points/points").get();
+            routes = getServerRequest.execute("http://10.0.2.2:3000/points/routes").get();
             Log.i("SIZE", " -> " + routes.length());
 
             JSONObject aux = new JSONObject(routes.get(2).toString());
@@ -55,7 +59,11 @@ public class RouteActivity extends DrawerBaseActivity {
 
             for (int i = 0; i<routes.length();i++){
                 String routeName = routes.getJSONObject(i).getString("name");
+                int routeId = routes.getJSONObject(i).getInt("id");
+                Route route = new Route (routeId,routeName);
+                routeList.add(route);
                 pointArrayList.add(routeName);
+
 
                     pointArrayAdapter.notifyDataSetChanged();
 
@@ -68,7 +76,19 @@ public class RouteActivity extends DrawerBaseActivity {
          listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
              @Override
              public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                 Toast.makeText(RouteActivity.this, " " + adapterView.getItemAtPosition(i), Toast.LENGTH_SHORT).show();
+                 Log.i("ITEM",adapterView.getItemAtPosition(i).toString() );
+                 String routeName = adapterView.getItemAtPosition(i).toString();
+                 for (int j = 0; j<routeList.size(); j++){
+                     if(routeName == routeList.get(j).getName()){
+                         routeIdAll = routeList.get(j).getId();
+
+                         System.out.println(routeIdAll);
+                         isRoute = true;
+                         Intent intent = new Intent (RouteActivity.this,MapsActivity.class);
+                         startActivity(intent);
+                         overridePendingTransition(0,0);
+                     }
+                 }
              }
          });
 

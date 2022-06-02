@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -56,8 +57,9 @@ public class MapsActivity extends DrawerBaseActivity implements OnMapReadyCallba
 
     ActivityMapsBinding activityMapsBinding;
 
-    serverRequest getServerRequest = new serverRequest();
+    serverRequest getServerRequest;
     JSONArray points = null;
+    JSONArray rPoints = null;
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
     private static final int LOCATION_PERMISSION_CODE = 101;
@@ -68,10 +70,12 @@ public class MapsActivity extends DrawerBaseActivity implements OnMapReadyCallba
     int delay = 5000;
     MediaPlayer mp;
     List <Point> pointList = new ArrayList<>();
+    List <Point> rPointList = new ArrayList<>();
     private double markerLat;
     private double markerLon;
     private int cont = 0;
-    private boolean route = false;
+    public static boolean route = RouteActivity.isRoute;
+
 
 
 
@@ -86,16 +90,6 @@ public class MapsActivity extends DrawerBaseActivity implements OnMapReadyCallba
         setContentView(activityMapsBinding.getRoot());
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
-
-        Button button = (Button) findViewById(R.id.routeButton);
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                route = true;
-                cont = 0;
-                nextRoutePoint();
-            }
-        });
 
 
 
@@ -137,37 +131,74 @@ public class MapsActivity extends DrawerBaseActivity implements OnMapReadyCallba
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        try {
-            points = getServerRequest.execute("http://10.0.2.2:3000/points/points").get();
-            Log.i("SIZE", " -> " + points.length());
+        if(route){
+            cont = 0;
+            try {
+                getServerRequest = new serverRequest();
+                Log.i("request", " -> " + "REQUEST");
+                rPoints =  getServerRequest.execute("http://10.0.2.2:3000/points/"+RouteActivity.routeIdAll+"/route").get();
+                Log.i("SIZE", " -> " + rPoints.length());
 
-            JSONObject aux = new JSONObject(points.get(2).toString());
-            Log.i("OBJECT", aux.toString());
-
-
-            for (int i = 0; i<points.length();i++){
-                Point point = new Point(points.getJSONObject(i).getInt("id"),
-                        points.getJSONObject(i).getDouble("longi"),
-                        points.getJSONObject(i).getDouble("lati"),
-                        points.getJSONObject(i).getString("name"),
-                        points.getJSONObject(i).getString("description"),
-                        points.getJSONObject(i).getString("build"));
-                        pointList.add(point);
-
-                markerLon = pointList.get(i).getLongi();
-                markerLat = pointList.get(i).getLati();
-
-                LatLng marker = new LatLng(markerLon,markerLat);
-                mMap.addMarker(new MarkerOptions().position(marker).title(pointList.get(i).getName()));
-
-                Log.i("marker", pointList.get(i).getLati() + " " + pointList.get(i).getLongi() + " " + pointList.get(i).getName());
+                JSONObject aux = new JSONObject(rPoints.get(2).toString());
+                Log.i("OBJECT", aux.toString());
 
 
+                for (int i = 0; i<rPoints.length();i++){
+                    Point point = new Point(rPoints.getJSONObject(i).getInt("id"),
+                            rPoints.getJSONObject(i).getDouble("longi"),
+                            rPoints.getJSONObject(i).getDouble("lati"),
+                            rPoints.getJSONObject(i).getString("name"),
+                            "NA",
+                            "NA");
+                    rPointList.add(point);
+
+                    Log.i("ROTA", rPointList.get(i).getLongi()+" "+ rPointList.get(i).getLati());
+
+
+                }
+
+                nextRoutePoint();
+
+            } catch (ExecutionException | JSONException | InterruptedException e) {
+                e.printStackTrace();
             }
 
-        } catch (ExecutionException | JSONException | InterruptedException e) {
-            e.printStackTrace();
+        }else {
+            try {
+                getServerRequest = new serverRequest();
+                points = getServerRequest.execute("http://10.0.2.2:3000/points/points").get();
+                Log.i("SIZE", " -> " + points.length());
+
+                JSONObject aux = new JSONObject(points.get(2).toString());
+                Log.i("OBJECT", aux.toString());
+
+
+                for (int i = 0; i<points.length();i++){
+                    Point point = new Point(points.getJSONObject(i).getInt("id"),
+                            points.getJSONObject(i).getDouble("longi"),
+                            points.getJSONObject(i).getDouble("lati"),
+                            points.getJSONObject(i).getString("name"),
+                            points.getJSONObject(i).getString("description"),
+                            points.getJSONObject(i).getString("build"));
+                    pointList.add(point);
+
+                    markerLon = pointList.get(i).getLongi();
+                    markerLat = pointList.get(i).getLati();
+
+                    LatLng marker = new LatLng(markerLon,markerLat);
+                    mMap.addMarker(new MarkerOptions().position(marker).title(pointList.get(i).getName()));
+
+                    Log.i("marker", pointList.get(i).getLati() + " " + pointList.get(i).getLongi() + " " + pointList.get(i).getName());
+
+
+                }
+
+            } catch (ExecutionException | JSONException | InterruptedException e) {
+                e.printStackTrace();
+            }
+
         }
+
 
 
 
@@ -240,7 +271,7 @@ public class MapsActivity extends DrawerBaseActivity implements OnMapReadyCallba
                 mp.start();
 
 
-                if (cont<pointList.size()){
+                if (cont<rPointList.size()){
                     cont++;
                     nextRoutePoint();
                     Log.i("PROXIMO DENTRO", "" + cont);
@@ -249,7 +280,7 @@ public class MapsActivity extends DrawerBaseActivity implements OnMapReadyCallba
                     route = false;
                     cont = 0;
                     handler.removeCallbacks(runnable);
-                    Log.i("ROUTA", "rota terminada");
+                    Log.i("ROTA", "rota terminada");
                     cont = 0;
 
 
@@ -263,11 +294,13 @@ public class MapsActivity extends DrawerBaseActivity implements OnMapReadyCallba
         private void nextRoutePoint () {
          handler.removeCallbacks(runnable);
             mMap.clear();
-            markerLon = pointList.get(cont).getLongi();
-            markerLat = pointList.get(cont).getLati();
+            Log.i("SIZE", " -> " + rPointList.size());
+            markerLon = rPointList.get(cont).getLongi();
+            markerLat = rPointList.get(cont).getLati();
+            Log.i("ROTA", rPointList.get(cont).getLongi()+" "+ rPointList.get(cont).getLati());
 
             LatLng marker = new LatLng(markerLon,markerLat);
-            mMap.addMarker(new MarkerOptions().position(marker).title(pointList.get(cont).getName()));
+            mMap.addMarker(new MarkerOptions().position(marker).title(rPointList.get(cont).getName()));
 
             mMap.addCircle( new CircleOptions()
                     .center(marker)
