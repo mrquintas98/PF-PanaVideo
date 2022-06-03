@@ -149,7 +149,8 @@ public class MapsActivity extends DrawerBaseActivity implements OnMapReadyCallba
                             rPoints.getJSONObject(i).getDouble("lati"),
                             rPoints.getJSONObject(i).getString("name"),
                             "NA",
-                            "NA");
+                            "NA",
+                            rPoints.getJSONObject(i).getString("pathfile"));
                     rPointList.add(point);
 
                     Log.i("ROTA", rPointList.get(i).getLongi()+" "+ rPointList.get(i).getLati());
@@ -179,7 +180,8 @@ public class MapsActivity extends DrawerBaseActivity implements OnMapReadyCallba
                             points.getJSONObject(i).getDouble("lati"),
                             points.getJSONObject(i).getString("name"),
                             points.getJSONObject(i).getString("description"),
-                            points.getJSONObject(i).getString("build"));
+                            points.getJSONObject(i).getString("build"),
+                            "NA");
                     pointList.add(point);
 
                     markerLon = pointList.get(i).getLongi();
@@ -266,8 +268,13 @@ public class MapsActivity extends DrawerBaseActivity implements OnMapReadyCallba
 
             if (distanceInMeters < radius) {
                 // User is inside the Geo-fence
+
                 Log.i("GEOFENCE", "Utilizador dentro");
-                mp = MediaPlayer.create(this, R.raw.ding);
+
+                int resId = getResources().getIdentifier(rPointList.get(cont).getPath(),"raw",getPackageName());
+                System.out.println("RESID "+ resId);
+                MediaPlayer mp;
+                mp = MediaPlayer.create(this,resId);
                 mp.start();
 
 
@@ -279,6 +286,7 @@ public class MapsActivity extends DrawerBaseActivity implements OnMapReadyCallba
                 else{
                     route = false;
                     cont = 0;
+                    mp.release();
                     handler.removeCallbacks(runnable);
                     Log.i("ROTA", "rota terminada");
                     cont = 0;

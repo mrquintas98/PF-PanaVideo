@@ -7,14 +7,16 @@ public class Point {
     private String name;
     private String description;
     private String build;
+    private String path;
 
-    public Point (int id,double longi,double lati,String name,String description,String build){
+    public Point (int id,double longi,double lati,String name,String description,String build, String path){
         this.id = id;
         this.longi = longi;
         this.lati = lati;
         this.name = name;
         this.description = description;
         this.build = build;
+        this.path = path;
     }
 
     public Point (){
@@ -26,7 +28,15 @@ public class Point {
         this.build = build;
     }
 
-    public Point (float longi,float lati){
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public Point (float longi, float lati){
         this.id = id;
         this.longi = longi;
         this.lati = lati;

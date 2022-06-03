@@ -3,7 +3,12 @@ package com.example.javappandroid;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -20,6 +25,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -49,6 +55,7 @@ public class RouteActivity extends DrawerBaseActivity {
         pointArrayAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1,pointArrayList);
         listView.setAdapter(pointArrayAdapter);
 
+
         try {
             routes = getServerRequest.execute("http://10.0.2.2:3000/points/routes").get();
             Log.i("SIZE", " -> " + routes.length());
@@ -73,7 +80,8 @@ public class RouteActivity extends DrawerBaseActivity {
             e.printStackTrace();
         }
 
-         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
              @Override
              public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                  Log.i("ITEM",adapterView.getItemAtPosition(i).toString() );
@@ -81,7 +89,6 @@ public class RouteActivity extends DrawerBaseActivity {
                  for (int j = 0; j<routeList.size(); j++){
                      if(routeName == routeList.get(j).getName()){
                          routeIdAll = routeList.get(j).getId();
-
                          System.out.println(routeIdAll);
                          isRoute = true;
                          Intent intent = new Intent (RouteActivity.this,MapsActivity.class);
