@@ -2,7 +2,7 @@ var pool = require ("./connections");
 
 module.exports.loginUser = async function(email,pass) {
     try {
-        let sql ="Select * from user where user_email = $1 and user_password = $2";
+        let sql ="Select * from userinf where email = $1 and password = $2";
         let result = await pool.query(sql,[email,pass]);
         if (result.rows.length > 0)
             return { status:200, result:result.rows[0]};

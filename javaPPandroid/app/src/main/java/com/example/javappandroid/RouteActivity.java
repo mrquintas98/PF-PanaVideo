@@ -57,7 +57,7 @@ public class RouteActivity extends DrawerBaseActivity {
 
 
         try {
-            routes = getServerRequest.execute("http://10.0.2.2:3000/points/routes").get();
+            routes = getServerRequest.execute("https://prototype-p.herokuapp.com/points/routes").get();
             Log.i("SIZE", " -> " + routes.length());
 
             JSONObject aux = new JSONObject(routes.get(2).toString());

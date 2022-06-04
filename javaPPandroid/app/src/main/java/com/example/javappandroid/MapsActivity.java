@@ -136,7 +136,7 @@ public class MapsActivity extends DrawerBaseActivity implements OnMapReadyCallba
             try {
                 getServerRequest = new serverRequest();
                 Log.i("request", " -> " + "REQUEST");
-                rPoints =  getServerRequest.execute("http://10.0.2.2:3000/points/"+RouteActivity.routeIdAll+"/route").get();
+                rPoints =  getServerRequest.execute("https://prototype-p.herokuapp.com/points/"+RouteActivity.routeIdAll+"/route").get();
                 Log.i("SIZE", " -> " + rPoints.length());
 
                 JSONObject aux = new JSONObject(rPoints.get(2).toString());
@@ -167,7 +167,7 @@ public class MapsActivity extends DrawerBaseActivity implements OnMapReadyCallba
         }else {
             try {
                 getServerRequest = new serverRequest();
-                points = getServerRequest.execute("http://10.0.2.2:3000/points/points").get();
+                points = getServerRequest.execute("https://prototype-p.herokuapp.com/points/points").get();
                 Log.i("SIZE", " -> " + points.length());
 
                 JSONObject aux = new JSONObject(points.get(2).toString());
@@ -273,10 +273,17 @@ public class MapsActivity extends DrawerBaseActivity implements OnMapReadyCallba
 
                 int resId = getResources().getIdentifier(rPointList.get(cont).getPath(),"raw",getPackageName());
                 System.out.println("RESID "+ resId);
-                MediaPlayer mp;
-                mp = MediaPlayer.create(this,resId);
-                mp.start();
 
+                if (resId != 0) {
+                    if (mp != null) {
+                        mp.release();
+                        mp = MediaPlayer.create(this, resId);
+                        mp.start();
+                    }else {
+                        mp = MediaPlayer.create(this, resId);
+                        mp.start();
+                    }
+                }
 
                 if (cont<rPointList.size()){
                     cont++;

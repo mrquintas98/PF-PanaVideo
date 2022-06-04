@@ -13,11 +13,6 @@
         android:layout_height="match_parent"
         tools:context=".MapsActivity" />
 
-    <Button
-        android:id="@+id/routeButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Rota" />
 
 
 </RelativeLayout>

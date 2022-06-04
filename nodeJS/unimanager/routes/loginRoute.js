@@ -1,11 +1,11 @@
 var express = require('express');
 var router = express.Router();
-var userModel = require("../models/pointsModel");
+var loginModel = require("../models/loginModel");
 
 router.post('/login',async function(req, res, next) {
     let email = req.body.email;
-    let password = req.body.pass;
-    let result = await userModel.loginUser(email,password);
+    let password = req.body.password;
+    let result = await loginModel.loginUser(email,password);
     res.status(result.status).send(result.result);
 });
 
