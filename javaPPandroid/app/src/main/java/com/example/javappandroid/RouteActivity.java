@@ -54,6 +54,7 @@ public class RouteActivity extends DrawerBaseActivity {
         pointArrayList = new ArrayList<>();
         pointArrayAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1,pointArrayList);
         listView.setAdapter(pointArrayAdapter);
+        isRoute = false;
 
 
         try {

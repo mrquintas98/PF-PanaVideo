@@ -18,11 +18,16 @@ import java.util.Map;
 
 public class Post extends AsyncTask<String, Void, JSONArray> {
     JSONObject postData;
+    int status = 0;
 
     public Post(Map<String, String> postData) {
         if (postData != null) {
             this.postData = new JSONObject(postData);
         }
+    }
+
+    public int getStatusCode (){
+        return status;
     }
 
     @Override
@@ -48,6 +53,8 @@ public class Post extends AsyncTask<String, Void, JSONArray> {
             }
 
             int statusCode = urlConnection.getResponseCode();
+            status = statusCode;
+            System.out.println("STATUS POST = "+ status);
 
             if (statusCode == 200) {
 
@@ -55,6 +62,7 @@ public class Post extends AsyncTask<String, Void, JSONArray> {
 
                 String response = convertInputStreamToString(inputStream);
                 Log.i("RESULT", response);
+
 
                 // Falta converter para JSON ARRAY ou JSONOBJECT
 

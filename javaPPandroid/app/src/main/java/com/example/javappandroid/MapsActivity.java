@@ -74,7 +74,7 @@ public class MapsActivity extends DrawerBaseActivity implements OnMapReadyCallba
     private double markerLat;
     private double markerLon;
     private int cont = 0;
-    public static boolean route = RouteActivity.isRoute;
+    boolean route = RouteActivity.isRoute;
 
 
 
@@ -130,7 +130,7 @@ public class MapsActivity extends DrawerBaseActivity implements OnMapReadyCallba
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
+        System.out.println("ISROUTE ="+route);
         if(route){
             cont = 0;
             try {
@@ -165,6 +165,7 @@ public class MapsActivity extends DrawerBaseActivity implements OnMapReadyCallba
             }
 
         }else {
+
             try {
                 getServerRequest = new serverRequest();
                 points = getServerRequest.execute("https://prototype-p.herokuapp.com/points/points").get();
