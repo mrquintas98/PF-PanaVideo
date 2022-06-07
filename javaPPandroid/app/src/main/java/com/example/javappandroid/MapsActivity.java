@@ -148,7 +148,7 @@ public class MapsActivity extends DrawerBaseActivity implements OnMapReadyCallba
                             rPoints.getJSONObject(i).getDouble("longi"),
                             rPoints.getJSONObject(i).getDouble("lati"),
                             rPoints.getJSONObject(i).getString("name"),
-                            "NA",
+                            rPoints.getJSONObject(i).getString("description"),
                             "NA",
                             rPoints.getJSONObject(i).getString("pathfile"));
                     rPointList.add(point);
@@ -189,7 +189,7 @@ public class MapsActivity extends DrawerBaseActivity implements OnMapReadyCallba
                     markerLat = pointList.get(i).getLati();
 
                     LatLng marker = new LatLng(markerLon,markerLat);
-                    mMap.addMarker(new MarkerOptions().position(marker).title(pointList.get(i).getName()));
+                    mMap.addMarker(new MarkerOptions().position(marker).title(pointList.get(i).getName()).snippet(pointList.get(i).getDescription()));
 
                     Log.i("marker", pointList.get(i).getLati() + " " + pointList.get(i).getLongi() + " " + pointList.get(i).getName());
 
@@ -316,7 +316,7 @@ public class MapsActivity extends DrawerBaseActivity implements OnMapReadyCallba
             Log.i("ROTA", rPointList.get(cont).getLongi()+" "+ rPointList.get(cont).getLati());
 
             LatLng marker = new LatLng(markerLon,markerLat);
-            mMap.addMarker(new MarkerOptions().position(marker).title(rPointList.get(cont).getName()));
+            mMap.addMarker(new MarkerOptions().position(marker).title(rPointList.get(cont).getName()).snippet(rPointList.get(cont).getDescription()));
 
             mMap.addCircle( new CircleOptions()
                     .center(marker)
